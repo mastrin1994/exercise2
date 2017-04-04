@@ -1,13 +1,11 @@
 package wdsr.exercise2.counter;
 
-/**
- * Created by Marek on 05.03.2016.
- * 
- * Task: use {@see java.util.concurrent.locks.Lock} to make CountingFacadeWithLockTest pass. 
- */
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class CountingFacadeWithLock implements CountingFacade {
 	private final BusinessService businessService;
-	
+	private final Lock lock = new ReentrantLock();
 	private int invocationCounter;
 	
 	public CountingFacadeWithLock(BusinessService businessService) {
@@ -15,8 +13,14 @@ public class CountingFacadeWithLock implements CountingFacade {
 	}
 		
 	public void countAndInvoke() {
-		invocationCounter++;
-		businessService.executeAction();
+		this.lock.lock();
+		try{
+			invocationCounter++;
+			businessService.executeAction();
+		}
+        finally { 
+        	lock.unlock(); 
+        }
 	}
 	
 	public int getCount() {
